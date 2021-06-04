@@ -1,6 +1,8 @@
 package skinny.http
 
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
+
+import scala.collection.mutable
 
 class RequestSpec extends WordSpec with Matchers {
 
@@ -19,6 +21,14 @@ class RequestSpec extends WordSpec with Matchers {
       request.header("foo") should equal(None)
       request.header("foo", "bar")
       request.headerNames.size should equal(1)
+    }
+  }
+
+  "Test queryParams" should {
+    "add queryParams value" in {
+      val target = request.queryParams(("k", "v"), ("k1", "v1"))
+      val expected = List(QueryParam("k", "v"), QueryParam("k1", "v1"))
+      target.queryParams should equal(expected)
     }
   }
 

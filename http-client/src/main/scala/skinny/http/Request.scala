@@ -28,7 +28,7 @@ object Request {
 /**
   * HTTP/1.1 Request.
   */
-case class Request(var url: String) {
+case class Request(var url: String, queryParams: List[QueryParam] = List[QueryParam]()) {
 
   private[this] def returningThis(f: => Any): Request = {
     f
@@ -46,7 +46,6 @@ case class Request(var url: String) {
   var charset: Option[String]   = Some("UTF-8")
 
   var headers: mutable.Map[String, String]        = mutable.HashMap[String, String]()
-  var queryParams: mutable.ListBuffer[QueryParam] = mutable.ListBuffer[QueryParam]()
 
   def requestBody: RequestBody = RequestBody(this)
 
@@ -72,9 +71,10 @@ case class Request(var url: String) {
   def header(name: String): Option[String]         = headers.get(name)
   def header(name: String, value: String): Request = returningThis { headers += name -> value }
 
-  def queryParams(params: (String, Any)*): Request = returningThis { params.foreach(p => queryParam(p)) }
-  def queryParam(param: (String, Any)): Request = returningThis {
-    queryParams += QueryParam(param._1, param._2)
+  def queryParams(params: (String, Any)*): Request = params.foldLeft(this)((r, p) => r.queryParam(p))
+  def queryParam(param: (String, Any)): Request = {
+    val value = this.queryParams :+ QueryParam(param._1, param._2)
+    this.copy(queryParams = value)
   }
   def formParams(params: (String, Any)*): Request = returningThis {
     params.foreach { case (k, v) => formParams.update(k, v) }
