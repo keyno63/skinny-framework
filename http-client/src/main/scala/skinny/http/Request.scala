@@ -38,8 +38,8 @@ case class Request(var url: String, queryParams: List[QueryParam] = List[QueryPa
   var enableThrowingIOException: Boolean = false
   var followRedirects: Boolean           = HttpURLConnection.getFollowRedirects
 
-  var connectTimeoutMillis = HTTP.defaultConnectTimeoutMillis
-  var readTimeoutMillis    = HTTP.defaultReadTimeoutMillis
+  var connectTimeoutMillis: Int = HTTP.defaultConnectTimeoutMillis
+  var readTimeoutMillis: Int = HTTP.defaultReadTimeoutMillis
 
   var referer: Option[String]   = None
   var userAgent: Option[String] = Some("skinny-http-client default user agent - http://skinny-framework.org/")
@@ -94,7 +94,7 @@ case class Request(var url: String, queryParams: List[QueryParam] = List[QueryPa
   }
 
   def toHttpURLConnection(method: Method): HttpURLConnection = {
-    if (!queryParams.isEmpty) {
+    if (queryParams.nonEmpty) {
       for (queryParam <- queryParams) {
         if (queryParam.value != null) {
           val name: String     = queryParam.name
